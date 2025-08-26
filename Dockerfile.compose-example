@@ -1,0 +1,14 @@
+# Используем официальный образ Python 3.12
+FROM python:3.12-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем все файлы из текущей директории в контейнер
+COPY . .
+
+# Устанавливаем зависимость redis
+RUN pip install --no-cache-dir redis
+
+# Команда для запуска скрипта при старте контейнера
+CMD ["python", "docker_compose_example.py"]
