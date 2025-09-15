@@ -5,7 +5,7 @@
 
 Цель задания:
 Реализовать скрипт, который:
-1. Создаёт пользователя через эндпоинт POST /api/v1/users сервиса http-gateway
+1. Создаёт пользователя через эндпоинт POST /api/v1/cards сервиса http-gateway
 2. Создаёт депозитный счёт для этого пользователя через эндпоинт POST /api/v1/accounts/open-deposit-account
 3. Выводит в консоль:
     JSON-ответ от сервера с данными о созданном счёте
@@ -28,7 +28,7 @@ payload = {
     "phoneNumber": fake.phone_number()
 }
 
-# Выполняем POST-запрос к эндпоинту /api/v1/users
+# Выполняем POST-запрос к эндпоинту /api/v1/cards
 response = httpx.post("http://localhost:8003/api/v1/users", json=payload)
 
 user_id=None

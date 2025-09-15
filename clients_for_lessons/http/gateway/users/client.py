@@ -1,5 +1,5 @@
 from httpx import Response
-from clients.http.client import HTTPClient
+from clients_for_lessons.http.client import HTTPClient
 from typing import TypedDict
 
 
@@ -16,7 +16,7 @@ class CreateUserRequestDict(TypedDict):
 
 class UsersGatewayHTTPClient(HTTPClient):
     """
-    Клиент для взаимодействия с /api/v1/users сервиса http-gateway.
+    Клиент для взаимодействия с /api/v1/cards сервиса http-gateway.
     """
 
     def get_user_api(self, user_id: str) -> Response:
@@ -26,7 +26,7 @@ class UsersGatewayHTTPClient(HTTPClient):
         :param user_id: Идентификатор пользователя.
         :return: Ответ от сервера (объект httpx.Response).
         """
-        return self.get(f"/api/v1/users/{user_id}")
+        return self.get(f"/api/v1/cards/{user_id}")
 
     def create_user_api(self, request: CreateUserRequestDict) -> Response:
         """
@@ -35,4 +35,9 @@ class UsersGatewayHTTPClient(HTTPClient):
         :param request: Словарь с данными нового пользователя.
         :return: Ответ от сервера (объект httpx.Response).
         """
-        return self.post("/api/v1/users", json=request)
+        return self.post("/api/v1/cards", json=request)
+
+
+#def имя_метода(параметры) -> тип_возвращаемого_значения:
+    # тело метода
+    # return значение
