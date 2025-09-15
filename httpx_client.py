@@ -23,7 +23,7 @@ payload = {
 }
 
 # Выполняем POST-запрос, используя клиент
-response = client.post("/api/v1/cards", json=payload)
+response = client.post("/api/v1/users", json=payload)
 
 # Выводим ответ в консоль
 print(response.text)

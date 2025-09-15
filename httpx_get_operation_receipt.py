@@ -1,6 +1,6 @@
 '''
 Что должен делать скрипт:
-    1. Создать пользователя. Выполнить POST-запрос на эндпоинт: POST /api/v1/cards → Получить userId из ответа.
+    1. Создать пользователя. Выполнить POST-запрос на эндпоинт: POST /api/v1/users → Получить userId из ответа.
     2. Создать кредитный счёт для пользователя. Выполнить POST-запрос на эндпоинт:
         POST /api/v1/accounts/open-credit-card-account → Получить accountId и cardId из ответа
         (кредитный счёт создаётся с картой).
@@ -33,7 +33,7 @@ payload = {
     "phoneNumber": fake.phone_number()
 }
 
-# 1. Выполняем POST-запрос к эндпоинту /api/v1/cards
+# 1. Выполняем POST-запрос к эндпоинту /api/v1/users
 response = httpx.post("http://localhost:8003/api/v1/users", json=payload)
 
 user_id = None
