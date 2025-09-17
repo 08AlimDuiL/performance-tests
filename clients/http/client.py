@@ -1,5 +1,5 @@
 from typing import Any
-from httpx import Client, URL, Response, QueryParams
+import httpx
 
 
 class HTTPClient:
@@ -8,20 +8,10 @@ class HTTPClient:
     :param client: экземпляр httpx.Client для выполнения HTTP-запросов
     """
 
-    def __init__(self, client: Client):
+    def __init__(self, client: httpx.Client):
         self.client = client
 
-    def get(self, url: URL | str, params: QueryParams | None = None) -> Response:
-        """
-        Выполняет GET-запрос.
-
-        :param url: URL-адрес эндпоинта.
-        :param params: GET-параметры запроса (например, ?key=value).
-        :return: Объект Response с данными ответа.
-        """
-        return self.client.get(url, params=params)
-
-    def post(self, url: str, json: Any | None = None) -> Response:
+    def post(self, url: str, json: Any | None = None) -> httpx.Response:
         """
         Выполняет POST-запрос.
         :param url: URL-адрес эндпоинта.
