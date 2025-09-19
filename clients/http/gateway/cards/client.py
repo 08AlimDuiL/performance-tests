@@ -1,49 +1,99 @@
-import httpx
-from clients.http.client import HTTPClient
 from typing import TypedDict
+from httpx import Response
+from clients.http.client import HTTPClient
+from clients.http.gateway.client import build_gateway_http_client  # Импортируем builder
 
 
-class IssueCardsRequestDict(TypedDict):
+# Добавили описание структуры карты
+class CardDict(TypedDict):
     """
-    Структура данных для создания карты (виртуальной или физической).
+    Описание структуры карты.
+    """
+    id: str
+    pin: str
+    cvv: str
+    type: str
+    status: str
+    accountId: str
+    cardNumber: str
+    cardHolder: str
+    expiryDate: str
+    paymentSystem: str
 
-    :param userId: Идентификатор пользователя
-    :param accountId: Идентификатор счета для привязки карты
+
+class IssueVirtualCardRequestDict(TypedDict):
+    """
+    Структура данных для выпуска виртуальной карты.
     """
     userId: str
     accountId: str
 
 
+# Добавили описание структуры ответа выпуска виртуальной карты
+class IssueVirtualCardResponseDict(TypedDict):
+    """
+    Описание структуры ответа выпуска виртуальной карты.
+    """
+    card: CardDict
+
+
+class IssuePhysicalCardRequestDict(TypedDict):
+    """
+    Структура данных для выпуска физической карты.
+    """
+    userId: str
+    accountId: str
+
+
+# Добавили описание структуры ответа выпуска физической карты
+class IssuePhysicalCardResponseDict(TypedDict):
+    """
+    Описание структуры ответа выпуска физической карты.
+    """
+    card: CardDict
+
+
 class CardsGatewayHTTPClient(HTTPClient):
     """
     Клиент для взаимодействия с /api/v1/cards сервиса http-gateway.
-    Предоставляет методы для работы с виртуальными и физическими картами.
     """
 
-    def issue_virtual_card_api(self, request: IssueCardsRequestDict) -> httpx.Response:
+    def issue_virtual_card_api(self, request: IssueVirtualCardRequestDict) -> Response:
         """
-        Создание виртуальной карты через API.
+        Выпуск виртуальной карты.
 
-        Выполняет POST-запрос к эндпоинту /api/v1/cards/issue-virtual-card
-        для создания новой виртуальной карты.
-
-        :param request: Словарь с данными для создания виртуальной карты.
-                        Должен содержать обязательные поля: userId, accountId.
-        :return: Ответ от сервера (объект httpx.Response) с информацией о созданной карте
-                 или ошибкой валидации.
+        :param request: Словарь с данными для выпуска виртуальной карты.
+        :return: Ответ от сервера (объект httpx.Response).
         """
         return self.post("/api/v1/cards/issue-virtual-card", json=request)
 
-    def issue_physical_card_api(self, request: IssueCardsRequestDict) -> httpx.Response:
+    def issue_physical_card_api(self, request: IssuePhysicalCardRequestDict) -> Response:
         """
-        Создание физической карты через API.
+        Выпуск физической карты.
 
-        Выполняет POST-запрос к эндпоинту /api/v1/cards/issue-physical-card
-        для создания новой физической карты.
-
-        :param request: Словарь с данными для создания физической карты.
-                        Должен содержать обязательные поля: userId, accountId.
-        :return: Ответ от сервера (объект httpx.Response) с информацией о созданной карте
-                 или ошибкой валидации.
+        :param request: Словарь с данными для выпуска физической карты.
+        :return: Ответ от сервера (объект httpx.Response).
         """
         return self.post("/api/v1/cards/issue-physical-card", json=request)
+
+    # Добавили новый метод
+    def issue_virtual_card(self, user_id: str, account_id: str) -> IssueVirtualCardResponseDict:
+        request = IssueVirtualCardRequestDict(userId=user_id, accountId=account_id)
+        response = self.issue_virtual_card_api(request)
+        return response.json()
+
+    # Добавили новый метод
+    def issue_physical_card(self, user_id: str, account_id: str) -> IssuePhysicalCardResponseDict:
+        request = IssuePhysicalCardRequestDict(userId=user_id, accountId=account_id)
+        response = self.issue_physical_card_api(request)
+        return response.json()
+
+
+# Добавляем builder для CardsGatewayHTTPClient
+def build_cards_gateway_http_client() -> CardsGatewayHTTPClient:
+    """
+    Функция создаёт экземпляр CardsGatewayHTTPClient с уже настроенным HTTP-клиентом.
+
+    :return: Готовый к использованию CardsGatewayHTTPClient.
+    """
+    return CardsGatewayHTTPClient(client=build_gateway_http_client())
