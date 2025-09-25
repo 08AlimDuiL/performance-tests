@@ -1,56 +1,12 @@
-from typing import TypedDict
 from httpx import Response
 from clients_for_lessons.http.client import HTTPClient
-from clients_for_lessons.http.gateway.client import build_gateway_http_client  # Импортируем builder
-
-
-# Добавили описание структуры карты
-class CardDict(TypedDict):
-    """
-    Описание структуры карты.
-    """
-    id: str
-    pin: str
-    cvv: str
-    type: str
-    status: str
-    accountId: str
-    cardNumber: str
-    cardHolder: str
-    expiryDate: str
-    paymentSystem: str
-
-
-class IssueVirtualCardRequestDict(TypedDict):
-    """
-    Структура данных для выпуска виртуальной карты.
-    """
-    userId: str
-    accountId: str
-
-
-# Добавили описание структуры ответа выпуска виртуальной карты
-class IssueVirtualCardResponseDict(TypedDict):
-    """
-    Описание структуры ответа выпуска виртуальной карты.
-    """
-    card: CardDict
-
-
-class IssuePhysicalCardRequestDict(TypedDict):
-    """
-    Структура данных для выпуска физической карты.
-    """
-    userId: str
-    accountId: str
-
-
-# Добавили описание структуры ответа выпуска физической карты
-class IssuePhysicalCardResponseDict(TypedDict):
-    """
-    Описание структуры ответа выпуска физической карты.
-    """
-    card: CardDict
+from clients_for_lessons.http.gateway.cards.schema import (
+    IssueVirtualCardRequestSchema,
+    IssueVirtualCardResponseSchema,
+    IssuePhysicalCardRequestSchema,
+    IssuePhysicalCardResponseSchema
+)
+from clients_for_lessons.http.gateway.client import build_gateway_http_client
 
 
 class CardsGatewayHTTPClient(HTTPClient):
@@ -58,35 +14,41 @@ class CardsGatewayHTTPClient(HTTPClient):
     Клиент для взаимодействия с /api/v1/cards сервиса http-gateway.
     """
 
-    def issue_virtual_card_api(self, request: IssueVirtualCardRequestDict) -> Response:
+    def issue_virtual_card_api(self, request: IssueVirtualCardRequestSchema) -> Response:
         """
         Выпуск виртуальной карты.
 
         :param request: Словарь с данными для выпуска виртуальной карты.
         :return: Ответ от сервера (объект httpx.Response).
         """
-        return self.post("/api/v1/cards/issue-virtual-card", json=request)
+        return self.post(
+            "/api/v1/cards/issue-virtual-card",
+            json=request.model_dump(by_alias=True)
+        )
 
-    def issue_physical_card_api(self, request: IssuePhysicalCardRequestDict) -> Response:
+    def issue_physical_card_api(self, request: IssuePhysicalCardRequestSchema) -> Response:
         """
         Выпуск физической карты.
 
         :param request: Словарь с данными для выпуска физической карты.
         :return: Ответ от сервера (объект httpx.Response).
         """
-        return self.post("/api/v1/cards/issue-physical-card", json=request)
+        return self.post(
+            "/api/v1/cards/issue-physical-card",
+            request.model_dump(by_alias=True)
+        )
 
     # Добавили новый метод
-    def issue_virtual_card(self, user_id: str, account_id: str) -> IssueVirtualCardResponseDict:
-        request = IssueVirtualCardRequestDict(userId=user_id, accountId=account_id)
+    def issue_virtual_card(self, user_id: str, account_id: str) -> IssueVirtualCardResponseSchema:
+        request = IssueVirtualCardRequestSchema(userId=user_id, accountId=account_id)
         response = self.issue_virtual_card_api(request)
-        return response.json()
+        return IssueVirtualCardResponseSchema.model_validate_json(response.text)
 
     # Добавили новый метод
-    def issue_physical_card(self, user_id: str, account_id: str) -> IssuePhysicalCardResponseDict:
-        request = IssuePhysicalCardRequestDict(userId=user_id, accountId=account_id)
+    def issue_physical_card(self, user_id: str, account_id: str) -> IssuePhysicalCardResponseSchema:
+        request = IssuePhysicalCardRequestSchema(userId=user_id, accountId=account_id)
         response = self.issue_physical_card_api(request)
-        return response.json()
+        return IssuePhysicalCardResponseSchema.model_validate_json(response.text)
 
 
 # Добавляем builder для CardsGatewayHTTPClient
