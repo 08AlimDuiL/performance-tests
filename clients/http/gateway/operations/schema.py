@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 from enum import StrEnum
+from tools.fakers import fake
 
 
 class OperationType(StrEnum):
@@ -44,7 +45,7 @@ class OperationReceiptSchema(BaseModel):
     """
     Структура ответа с информацией о документе.
     """
-    url: HttpUrl = Field(..., min_length=1, max_length=2083)
+    url: HttpUrl  # при использовании встроенного типа HttpUrl нет необходимости дополнительно указывать Field(..., min_length=1, max_length=2083), вся нужная валидация уже встроенная на увроне типа HttpUrl.
     document: str
 
 
@@ -57,13 +58,13 @@ class GetOperationReceiptResponseSchema(BaseModel):
 
 class OperationsSummarySchema(BaseModel):
     """
-      Структура ответа с суммарной информацией.
+      Структура ответа с суммарной информацией. Описание структуры статистики по операциям.
     """
     model_config = ConfigDict(populate_by_name=True)
 
-    spentAmount: float
-    receivedAmount: float
-    cashbackAmount: float
+    spent_amount: float = Field(alias="spentAmount")  # для данных полей также рекомендуется примень альясы
+    received_amount: float = Field(alias="receivedAmount")
+    cashback_amount: float = Field(alias="cashbackAmount")
 
 
 class GetOperationsQuerySchema(BaseModel):
@@ -98,7 +99,7 @@ class GetOperationsSummaryResponseSchema(BaseModel):
     summary: OperationsSummarySchema
 
 
-class MakeOperationRequestSchema(BaseModel):
+class MakeOperationRequestSchema(BaseModel):  # *
     """
     Базовая структура данных для операций.
     Содержит общие поля для всех типов операций.
@@ -110,9 +111,9 @@ class MakeOperationRequestSchema(BaseModel):
     """
     model_config = ConfigDict(populate_by_name=True)
 
-    status: OperationStatus
-    amount: float
-    cardId: str
+    status: OperationStatus = Field(default_factory=lambda: fake.enum(OperationStatus))
+    amount: float = Field(default_factory=lambda: fake.amount())
+    card_id: str = Field(alias="cardId")  # для данного поля рекомендуется применить альяс.
     account_id: str = Field(alias="accountId")
 
 
@@ -160,11 +161,11 @@ class MakeTransferOperationResponseSchema(BaseModel):
     operation: OperationSchema
 
 
-class MakePurchaseOperationRequestSchema(MakeOperationRequestSchema):
+class MakePurchaseOperationRequestSchema(MakeOperationRequestSchema):  # *
     """
     Структура данных для создания операции покупки.
     """
-    category: str
+    category: str = Field(default_factory=lambda: fake.category())
 
 
 class MakePurchaseOperationResponseSchema(BaseModel):
