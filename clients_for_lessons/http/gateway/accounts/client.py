@@ -1,7 +1,6 @@
 from httpx import Response, QueryParams
-
-from clients.http.client import HTTPClient
-from clients.http.gateway.accounts.schema import (
+from clients_for_lessons.http.client import HTTPClient
+from clients_for_lessons.http.gateway.accounts.schema import (
     GetAccountsQuerySchema,
     GetAccountsResponseSchema,
     OpenDepositAccountRequestSchema,
