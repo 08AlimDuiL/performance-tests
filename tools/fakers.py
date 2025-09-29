@@ -1,5 +1,4 @@
 import time
-
 from faker import Faker
 from faker.providers.python import TEnum
 
